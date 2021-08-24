@@ -1,3 +1,4 @@
+// Lower time complexity for getAllCatsFor but overall higher gas cost to the smart contract
 pragma solidity ^0.8.0;
 
 contract Kittycontract {
