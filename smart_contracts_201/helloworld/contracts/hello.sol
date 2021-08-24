@@ -5,10 +5,9 @@ contract Helloworld {
 
   function setMessage(string memory newMessage) 
            public
-           returns (string memory)
+           payable
   {
     message = newMessage;
-    return message;
   }
 
   function hello() public view returns (string memory) {
