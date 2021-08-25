@@ -25,7 +25,8 @@ import "../node_modules/@openzeppelin/contracts/utils/Context.sol";
 contract CapperToken is Context, AccessControlEnumerable, ERC20Burnable, ERC20Pausable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    uint256 private immutable _cap;
+    bytes32 public constant CAPPER_ROLE = keccak256("CAPPER_ROLE");
+    uint256 private _cap;
 
     /**
      * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
@@ -42,6 +43,7 @@ contract CapperToken is Context, AccessControlEnumerable, ERC20Burnable, ERC20Pa
 
         _setupRole(MINTER_ROLE, _msgSender());
         _setupRole(PAUSER_ROLE, _msgSender());
+        _setupRole(CAPPER_ROLE, _msgSender());
     }
 
     /**
@@ -92,5 +94,28 @@ contract CapperToken is Context, AccessControlEnumerable, ERC20Burnable, ERC20Pa
         uint256 amount
     ) internal virtual override(ERC20, ERC20Pausable) {
         super._beforeTokenTransfer(from, to, amount);
+    }
+
+    /**
+    * @dev Returns the cap on the token's total supply.
+    */
+    function cap() public view virtual returns (uint256) {
+        return _cap;
+    }
+
+    /**
+    * @dev See {ERC20-_mint}.
+    */
+    function _mint(address account, uint256 amount) internal virtual override {
+        require(ERC20.totalSupply() + amount <= cap(), "ERC20Capped: cap exceeded");
+        super._mint(account, amount);
+    }
+
+    /**
+    * @dev Modifies the cap on the token's total supply.
+    */
+    function modifyCap(uint256 cap_) public virtual {
+      require(hasRole(CAPPER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have capper role to modify cap");
+      _cap = cap_;
     }
 }
