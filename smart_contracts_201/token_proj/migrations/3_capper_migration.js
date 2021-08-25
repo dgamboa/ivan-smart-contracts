@@ -4,5 +4,5 @@ const TOKEN_NAME = "Capper";
 const TOKEN_SYMBOL = "CPR";
 
 module.exports = function (deployer) {
-  deployer.deploy(Capper, TOKEN_NAME, TOKEN_SYMBOL);
+  deployer.deploy(Capper, TOKEN_NAME, TOKEN_SYMBOL, 1000);
 };
