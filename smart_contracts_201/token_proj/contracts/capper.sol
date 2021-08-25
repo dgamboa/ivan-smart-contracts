@@ -94,6 +94,8 @@ contract CapperToken is Context, AccessControlEnumerable, ERC20Burnable, ERC20Pa
         uint256 amount
     ) internal virtual override(ERC20, ERC20Pausable) {
         super._beforeTokenTransfer(from, to, amount);
+
+
     }
 
     /**
@@ -116,6 +118,7 @@ contract CapperToken is Context, AccessControlEnumerable, ERC20Burnable, ERC20Pa
     */
     function modifyCap(uint256 cap_) public virtual {
       require(hasRole(CAPPER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have capper role to modify cap");
+      require(cap_ > 0, "ERC20Capped: cap is 0");
       _cap = cap_;
     }
 }
