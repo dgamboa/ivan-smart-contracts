@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.0;
 
+import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 contract Wallet {
 
   struct Token {
@@ -12,5 +14,24 @@ contract Wallet {
   bytes32[] public tokenList;
 
   mapping(address => mapping(bytes32 => uint256)) public balances;
+
+  function addToken(bytes32 ticker, address tokenAddress) external {
+    tokenMapping[ticker] = Token(ticker, tokenAddress);
+    tokenList.push(ticker);
+  }
+
+  function deposit(uint amount, bytes32 ticker) external {
+
+  }
+
+  function withdraw(uint amount, bytes32 ticker) external {
+    require(tokenMapping[ticker].tokenAddress != address(0));
+    require(balances[msg.sender][ticker] >= amount,
+            "Balance not sufficient");
+
+    balances[msg.sender][ticker] -= amount;
+    IERC20(tokenMapping[ticker].tokenAddress)
+      .transfer(msg.sender, amount);    
+  }
 
 }
