@@ -37,13 +37,13 @@ contract("Dex", (accounts) => {
     let link = await Link.deployed();
     await link.approve(dex.address, 500);
     await dex.depositEth({ value: 3000 });
+    
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 300);
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 100);
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 200);
 
     let orderBook = await dex.getOrderBook(web3.utils.fromUtf8("LINK"), 0);
     assert(orderBook.length > 0, "Buy order book is empty");
-    console.log("Buy order book:", orderBook);
     for (let i = 0; i < orderBook.length - 1; i++) {
       assert(
         orderBook[i].price >= orderBook[i + 1].price,
@@ -56,14 +56,15 @@ contract("Dex", (accounts) => {
   it("should sort the sell order book from lowest to highest", async () => {
     let dex = await Dex.deployed();
     let link = await Link.deployed();
-    await link.approve(dex.address, 500);
+    await link.approve(dex.address, 600);
+    await dex.deposit(600, web3.utils.fromUtf8("LINK"));
+
     await dex.createLimitOrder(1, web3.utils.fromUtf8("LINK"), 1, 300);
     await dex.createLimitOrder(1, web3.utils.fromUtf8("LINK"), 1, 100);
     await dex.createLimitOrder(1, web3.utils.fromUtf8("LINK"), 1, 200);
 
     let orderBook = await dex.getOrderBook(web3.utils.fromUtf8("LINK"), 1);
     assert(orderBook.length > 0, "Sell order book is empty");
-    console.log("Sell order book:", orderBook);
     for (let i = 0; i < orderBook.length - 1; i++) {
       assert(
         orderBook[i].price <= orderBook[i + 1].price,
