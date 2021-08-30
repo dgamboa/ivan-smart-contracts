@@ -44,11 +44,11 @@ contract Dex is Wallet {
         if (side == Side.BUY) {
             require(
                 balances[msg.sender]["ETH"] >= amount.mul(price),
-                "Seller has insufficient balance"
+                "Buyer has insufficient balance"
             );
         } else if (side == Side.SELL) {
             require(
-                balances[msg.sender][ticker] >= amount.mul(price),
+                balances[msg.sender][ticker] >= amount,
                 "Seller has insufficient balance"
             );
         }
@@ -56,7 +56,7 @@ contract Dex is Wallet {
         Order[] storage orders = orderBook[ticker][uint256(side)];
 
         orders.push(
-            Order(nextOrderId, msg.sender, side, ticker, amount, price)
+            Order(nextOrderId, msg.sender, side, ticker, amount, price, 0)
         );
 
         // Bubble Sort:
@@ -143,7 +143,7 @@ contract Dex is Wallet {
         }
 
         // Remove 100% filled orders from the order book:
-        while (orders[0].filled == orders[0].amount && orders.length > 0) {
+        while (orders.length > 0 && orders[0].filled == orders[0].amount) {
           // Remove top element in the orders array by overwriting every element
           // with the next elemtn in the order list
           for (uint256 i = 0; i < orders.length - 1; i++) {

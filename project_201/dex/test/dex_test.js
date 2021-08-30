@@ -20,6 +20,9 @@ contract.skip("Dex", (accounts) => {
   it("should throw an error if token balance is too low when creating SELL limit order", async () => {
     let dex = await Dex.deployed();
     let link = await Link.deployed();
+    await truffleAssert.reverts(
+      dex.createLimitOrder(1, web3.utils.fromUtf8("LINK"), 10, 1)
+    );
     await link.approve(dex.address, 500);
     await dex.addToken(web3.utils.fromUtf8("LINK"), link.address, {
       from: accounts[0],
@@ -37,13 +40,14 @@ contract.skip("Dex", (accounts) => {
     let link = await Link.deployed();
     await link.approve(dex.address, 500);
     await dex.depositEth({ value: 3000 });
-    
+
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 300);
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 100);
     await dex.createLimitOrder(0, web3.utils.fromUtf8("LINK"), 1, 200);
 
     let orderBook = await dex.getOrderBook(web3.utils.fromUtf8("LINK"), 0);
     assert(orderBook.length > 0, "Buy order book is empty");
+
     for (let i = 0; i < orderBook.length - 1; i++) {
       assert(
         orderBook[i].price >= orderBook[i + 1].price,
@@ -65,6 +69,7 @@ contract.skip("Dex", (accounts) => {
 
     let orderBook = await dex.getOrderBook(web3.utils.fromUtf8("LINK"), 1);
     assert(orderBook.length > 0, "Sell order book is empty");
+
     for (let i = 0; i < orderBook.length - 1; i++) {
       assert(
         orderBook[i].price <= orderBook[i + 1].price,
