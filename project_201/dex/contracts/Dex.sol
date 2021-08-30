@@ -20,6 +20,7 @@ contract Dex is Wallet {
         bytes32 ticker;
         uint256 amount;
         uint256 price;
+        uint256 filled;
     }
 
     uint256 public nextOrderId = 0;
@@ -60,8 +61,10 @@ contract Dex is Wallet {
 
         // Bubble Sort:
         // The BUY order book should be ordered on price from highest to lowest starting at index 0
+        uint256 i = orders.length > 0 ? orders.length - 1 : 0;
+
         if (side == Side.BUY) {
-            for (uint256 i = orders.length - 1; i > 0; i--) {
+            for (i = orders.length - 1; i > 0; i--) {
                 if (orders[i].price > orders[i - 1].price) {
                     Order memory orderToMove = orders[i];
                     orders[i] = orders[i - 1];
@@ -70,7 +73,7 @@ contract Dex is Wallet {
             }
             // The SELL order book should be ordered on price from lowest to highest starting at index 0
         } else if (side == Side.SELL) {
-            for (uint256 i = orders.length - 1; i > 0; i--) {
+            for (i = orders.length - 1; i > 0; i--) {
                 if (orders[i].price < orders[i - 1].price) {
                     Order memory orderToMove = orders[i];
                     orders[i] = orders[i - 1];
@@ -80,5 +83,27 @@ contract Dex is Wallet {
         }
 
         nextOrderId++;
+    }
+
+    function createMarketOrder(
+        Side side,
+        bytes32 ticker,
+        uint256 amount
+    ) public {
+        uint256 orderBookSide;
+        orderBookSide = side == Side.BUY ? 1 : 0;
+        Order[] storage orders = orderBook[ticker][orderBookSide];
+
+        uint256 totalFilled;
+
+        for (uint256 i = 0; i < orders.length && totalFilled < amount; i++) {
+            // How much we can fill from order[i]
+            // update totalFilled
+            // Execute the trader & shift balances between buyer/seller
+            // Verify that the buyer has enough ETH to cover purchase (require)
+        }
+
+        // Loop through the order book and remove 100% filled orders
+        
     }
 }
