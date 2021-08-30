@@ -76,7 +76,7 @@ contract("Dex", (accounts) => {
       orderBook.length == 1,
       "Sell side order book should only have 1 order left"
     );
-    assert((orderBook[0].filled == 0), "Sell side order should have 0 filled");
+    assert(orderBook[0].filled == 0, "Sell side order should have 0 filled");
   });
 
   // Market orders should be filled until the order book is empty or the market order is 100% filled
